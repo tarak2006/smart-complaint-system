@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, Send, X, Bot, User } from 'lucide-react';
+import { API_BASE } from '../config';
 
 const ChatBot = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +25,6 @@ const ChatBot = () => {
         setInput('');
 
         try {
-            const API_BASE = 'https://urbancare-bqdae0ckayb5bufc.centralindia-01.azurewebsites.net';
             console.log('🤖 Sending message to AstraBot...');
 
             const body = {

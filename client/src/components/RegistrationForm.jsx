@@ -1,7 +1,4 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ClipboardList, User, Home, AlertCircle, Calendar } from 'lucide-react';
-import axios from 'axios';
+import { API_BASE } from '../config';
 
 const RegistrationForm = ({ user, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -33,7 +30,7 @@ const RegistrationForm = ({ user, onSuccess }) => {
                 const uploadFormData = new FormData();
                 uploadFormData.append('file', formData.image);
                 
-                const uploadRes = await axios.post('http://localhost:5000/api/upload', uploadFormData, {
+                const uploadRes = await axios.post(`${API_BASE}/api/upload`, uploadFormData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 uploadedUrl = uploadRes.data.url;
@@ -53,7 +50,7 @@ const RegistrationForm = ({ user, onSuccess }) => {
                 imageUrl: uploadedUrl
             };
 
-            const response = await fetch('http://localhost:5000/api/complaints', {
+            const response = await fetch(`${API_BASE}/api/complaints`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(complaintData)

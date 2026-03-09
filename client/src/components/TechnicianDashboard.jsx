@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Briefcase, Clipboard, CheckCircle, Package, Truck, AlertCircle } from 'lucide-react';
-import axios from 'axios';
+import { API_BASE } from '../config';
 
 const TechnicianDashboard = () => {
     const [tasks, setTasks] = useState([]);
@@ -10,7 +7,7 @@ const TechnicianDashboard = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/complaints');
+                const response = await axios.get(`${API_BASE}/api/complaints`);
                 setTasks(Array.isArray(response.data) ? response.data : [response.data]);
             } catch (err) {
                 console.error('Failed to fetch tasks:', err);
@@ -40,7 +37,7 @@ const TechnicianDashboard = () => {
         const technicianName = user.name || 'Unknown Technician';
 
         try {
-            await axios.patch(`http://localhost:5000/api/complaints/${id}`, { 
+            await axios.patch(`${API_BASE}/api/complaints/${id}`, { 
                 status: nextStatus,
                 technician: technicianName
             });

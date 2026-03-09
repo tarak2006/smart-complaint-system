@@ -1,7 +1,4 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileCode, CheckCircle, Image as ImageIcon, X } from 'lucide-react';
-import axios from 'axios';
+import { API_BASE } from '../config';
 
 const UploadZone = () => {
     const [file, setFile] = useState(null);
@@ -34,7 +31,7 @@ const UploadZone = () => {
 
         try {
             // Pointing to the backend API we created
-            const response = await axios.post('http://localhost:5000/api/upload', formData);
+            const response = await axios.post(`${API_BASE}/api/upload`, formData);
             setUploadedUrl(response.data.url);
             setUploading(false);
         } catch (err) {

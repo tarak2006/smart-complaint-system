@@ -1,7 +1,4 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Hash, Loader2 } from 'lucide-react';
-import axios from 'axios';
+import { API_BASE } from '../config';
 
 const TrackSearch = ({ onSearchResult }) => {
     const [complaintId, setComplaintId] = useState('');
@@ -16,7 +13,7 @@ const TrackSearch = ({ onSearchResult }) => {
         setError('');
 
         try {
-            const response = await axios.get(`http://localhost:5000/api/complaints/${complaintId.trim()}`);
+            const response = await axios.get(`${API_BASE}/api/complaints/${complaintId.trim()}`);
             onSearchResult(response.data);
         } catch (err) {
             console.error(err);

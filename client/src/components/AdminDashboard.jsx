@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Users, Filter, Search, MoreVertical, CheckCircle, Clock } from 'lucide-react';
-import axios from 'axios';
+import { API_BASE } from '../config';
 
 const AdminDashboard = () => {
     const [complaints, setComplaints] = useState([]);
@@ -10,7 +7,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchComplaints = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/complaints');
+                const response = await axios.get(`${API_BASE}/api/complaints`);
                 // Ensure response.data is an array. If it's a single object or something else, wrap it.
                 setComplaints(Array.isArray(response.data) ? response.data : [response.data]);
             } catch (err) {
@@ -24,7 +21,7 @@ const AdminDashboard = () => {
 
     const updateStatus = async (id, newStatus) => {
         try {
-            await axios.patch(`http://localhost:5000/api/complaints/${id}`, { status: newStatus });
+            await axios.patch(`${API_BASE}/api/complaints/${id}`, { status: newStatus });
             setComplaints(prev => prev.map(c => c.complaintId === id ? { ...c, status: newStatus } : c));
         } catch (err) {
             console.error('Failed to update status:', err);
