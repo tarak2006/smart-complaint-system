@@ -157,16 +157,18 @@ const TechnicianDashboard = () => {
                                     </button>
                                     {notif.complaint_id && (
                                         <button
-                                            className="glow-button"
-                                            style={{ padding: '6px 14px', fontSize: '0.85rem', background: 'var(--accent)', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
+                                            className="chat-btn"
+                                            style={{ padding: '6px 14px', fontSize: '0.85rem', background: '#1976d2', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer', transition: 'background 0.2s, color 0.2s' }}
                                             onClick={() => {
                                                 setChatOpen(true);
                                                 setChatComplaintId(notif.complaint_id);
                                                 fetchChatMessages(notif.complaint_id);
                                                 markAsRead(notif.id);
                                             }}
+                                            onMouseOver={e => { e.target.style.background = 'white'; e.target.style.color = '#1976d2'; }}
+                                            onMouseOut={e => { e.target.style.background = '#1976d2'; e.target.style.color = 'white'; }}
                                         >
-                                            Accept & Chat
+                                            Chat
                                         </button>
                                     )}
                                 </div>
