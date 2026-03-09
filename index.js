@@ -44,18 +44,6 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'Appliance Service API' });
 });
 
-// 2. Serve static files from the React app (Production)
-app.use(express.static(path.join(__dirname, '../client/dist')));
-
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api')) {
-    return next();
-  }
-  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-});
-
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
