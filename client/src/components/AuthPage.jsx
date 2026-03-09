@@ -15,17 +15,28 @@ const AuthPage = ({ onAuthSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    const [successMsg, setSuccessMsg] = useState('');
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+        setSuccessMsg('');
 
         const endpoint = isLogin ? 'login' : 'register';
         try {
             const response = await axios.post(`${API_BASE}/api/auth/${endpoint}`, formData);
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            onAuthSuccess(response.data.user);
+            if (isLogin) {
+                // Login: go to dashboard
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+                onAuthSuccess(response.data.user);
+            } else {
+                // Signup: show success message and switch to login
+                setSuccessMsg('Account created successfully! Please log in.');
+                setFormData({ name: '', email: '', password: '', role: 'User' });
+                setIsLogin(true);
+            }
         } catch (err) {
             setError(err.response?.data?.error || 'Authentication failed. Please check if the server is running and your credentials are correct.');
             console.error('Auth Error:', err);
@@ -106,6 +117,7 @@ const AuthPage = ({ onAuthSuccess }) => {
                         </div>
                     )}
 
+                    {successMsg && <p style={{ color: '#22c55e', fontSize: '0.85rem', textAlign: 'center', padding: '10px', background: 'rgba(34,197,94,0.1)', borderRadius: '8px' }}>{successMsg}</p>}
                     {error && <p style={{ color: '#ff4d4d', fontSize: '0.85rem', textAlign: 'center' }}>{error}</p>}
 
                     <button className="glow-button" type="submit" disabled={loading} style={{ marginTop: '10px', width: '100%' }}>
