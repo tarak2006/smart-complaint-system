@@ -1,3 +1,7 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Search, Hash, Loader2 } from 'lucide-react';
+import axios from 'axios';
 import { API_BASE } from '../config';
 
 const TrackSearch = ({ onSearchResult }) => {

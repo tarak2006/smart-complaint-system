@@ -1,3 +1,7 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { LogIn, UserPlus, Mail, Lock, User as UserIcon, ShieldCheck } from 'lucide-react';
+import axios from 'axios';
 import { API_BASE } from '../config';
 
 const AuthPage = ({ onAuthSuccess }) => {

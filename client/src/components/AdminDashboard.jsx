@@ -1,3 +1,7 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Users, Filter, Search, MoreVertical, CheckCircle, Clock } from 'lucide-react';
+import axios from 'axios';
 import { API_BASE } from '../config';
 
 const AdminDashboard = () => {

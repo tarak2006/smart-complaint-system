@@ -1,3 +1,7 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { ClipboardList, User, Home, AlertCircle, Calendar } from 'lucide-react';
+import axios from 'axios';
 import { API_BASE } from '../config';
 
 const RegistrationForm = ({ user, onSuccess }) => {

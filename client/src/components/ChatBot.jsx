@@ -1,3 +1,6 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MessageCircle, Send, X, Bot, User } from 'lucide-react';
 import { API_BASE } from '../config';
 
 const ChatBot = () => {

@@ -1,3 +1,7 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Upload, FileCode, CheckCircle, Image as ImageIcon, X } from 'lucide-react';
+import axios from 'axios';
 import { API_BASE } from '../config';
 
 const UploadZone = () => {
