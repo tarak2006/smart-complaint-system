@@ -70,7 +70,10 @@ class AstraBot extends ActivityHandler {
             else if (query.includes('contact') || query.includes('technician') || query.includes('talk')) {
                 // Extract ticket ID from context if possible
                 const lastTicket = query.match(/(ast-\d{4}-\w+|comp-\w+)/i)?.[0]?.toUpperCase() || null;
-                
+                if (!lastTicket) {
+                    await context.sendActivity(MessageFactory.text("To connect you with a technician, please provide your Complaint ID (e.g., AST-2026-XXXX or COMP-XXXX)."));
+                    return;
+                }
                 try {
                     await connectAndQuery(
                         'INSERT INTO BotNotifications (complaint_id, message) VALUES (?, ?)',
@@ -80,7 +83,6 @@ class AstraBot extends ActivityHandler {
                 } catch (err) {
                     console.error('❌ Failed to create bot notification:', err.message);
                 }
-
                 await context.sendActivity(MessageFactory.text("Connecting you to our technician portal... 📞\n\nPlease hold on while I notify the assigned specialist. Alternatively, you can call our priority line: **1800-ASTRA-CARE**."));
             }
 
