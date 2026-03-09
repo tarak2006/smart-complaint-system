@@ -147,13 +147,29 @@ const TechnicianDashboard = () => {
                                     </div>
                                     <div style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>{notif.message}</div>
                                 </div>
-                                <button 
-                                    onClick={() => markAsRead(notif.id)}
-                                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '5px' }}
-                                    title="Mark as Read"
-                                >
-                                    <X size={18} />
-                                </button>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button 
+                                        onClick={() => markAsRead(notif.id)}
+                                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '5px' }}
+                                        title="Mark as Read"
+                                    >
+                                        <X size={18} />
+                                    </button>
+                                    {notif.complaint_id && (
+                                        <button
+                                            className="glow-button"
+                                            style={{ padding: '6px 14px', fontSize: '0.85rem', background: 'var(--accent)', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
+                                            onClick={() => {
+                                                setChatOpen(true);
+                                                setChatComplaintId(notif.complaint_id);
+                                                fetchChatMessages(notif.complaint_id);
+                                                markAsRead(notif.id);
+                                            }}
+                                        >
+                                            Accept & Chat
+                                        </button>
+                                    )}
+                                </div>
                             </motion.div>
                         ))}
                     </div>
