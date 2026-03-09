@@ -41,7 +41,30 @@ app.use('/api/bot', require('./routes/bot'));
 app.use('/api/auth', require('./routes/auth'));
 
 app.get('/', (req, res) => {
-  res.send('<h1>Backend is LIVE!</h1><p>If you see this, the server is running correctly from the root folder.</p>');
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Appliance Service API</title>
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0a0a0a; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+            .card { background: #1a1a1a; padding: 2rem; border-radius: 12px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
+            h1 { color: #3b82f6; margin-bottom: 0.5rem; }
+            p { color: #888; }
+            .status { color: #10b981; font-weight: bold; margin-top: 1rem; }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h1>Backend is LIVE! 🚀</h1>
+            <p>Appliance Service Management System API</p>
+            <div class="status">● System Operational</div>
+        </div>
+    </body>
+    </html>
+  `);
 });
 
 app.get('/health', (req, res) => {
