@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { CloudAdapter, ConfigurationServiceClientCredentialFactory, createBotFrameworkAuthenticationFromConfiguration, ActivityHandler, MessageFactory } = require('botbuilder');
 const { getComplaintById } = require('../controllers/complaintController');
+const { connectAndQuery } = require('../config/db');
 
 console.log('🔄 Bot Route: Version 3.5 (Ultra-Stable Local Mode)');
 
@@ -67,6 +68,19 @@ class AstraBot extends ActivityHandler {
 
             // --- 2. Escalation / Contact Technician ---
             else if (query.includes('contact') || query.includes('technician') || query.includes('talk')) {
+                // Extract ticket ID from context if possible
+                const lastTicket = query.match(/(ast-\d{4}-\w+|comp-\w+)/i)?.[0]?.toUpperCase() || null;
+                
+                try {
+                    await connectAndQuery(
+                        'INSERT INTO BotNotifications (complaint_id, message) VALUES (?, ?)',
+                        [lastTicket, `User is requesting technical assistance. Input: "${rawText}"`]
+                    );
+                    console.log('✅ Notification sent to technician');
+                } catch (err) {
+                    console.error('❌ Failed to create bot notification:', err.message);
+                }
+
                 await context.sendActivity(MessageFactory.text("Connecting you to our technician portal... 📞\n\nPlease hold on while I notify the assigned specialist. Alternatively, you can call our priority line: **1800-ASTRA-CARE**."));
             }
 

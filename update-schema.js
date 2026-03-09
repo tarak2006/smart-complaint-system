@@ -35,6 +35,22 @@ async function updateSchema() {
         await pool.request().query(createTechniciansTable);
         console.log('Technicians table updated successfully.');
         
+        console.log('Creating/Updating BotNotifications table...');
+        const createNotificationsTable = `
+            IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID('BotNotifications') AND type in ('U'))
+            BEGIN
+                CREATE TABLE BotNotifications (
+                    id INT IDENTITY(1,1) PRIMARY KEY,
+                    complaint_id NVARCHAR(50) NULL,
+                    message NVARCHAR(MAX) NOT NULL,
+                    status NVARCHAR(50) DEFAULT 'Unread',
+                    created_at DATETIME DEFAULT GETDATE()
+                )
+            END
+        `;
+        await pool.request().query(createNotificationsTable);
+        console.log('BotNotifications table created successfully.');
+        
         console.log('Schema update complete.');
         process.exit(0);
     } catch (err) {

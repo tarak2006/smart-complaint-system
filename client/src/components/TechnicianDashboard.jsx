@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Briefcase, Clipboard, CheckCircle, Package, Truck, AlertCircle } from 'lucide-react';
+import { Briefcase, Clipboard, CheckCircle, Package, Truck, AlertCircle, Bell, X } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE } from '../config';
 
 const TechnicianDashboard = () => {
     const [tasks, setTasks] = useState([]);
+    const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const fetchNotifications = async () => {
+        try {
+            const response = await axios.get(`${API_BASE}/api/notifications`);
+            setNotifications(response.data);
+        } catch (err) {
+            console.error('Failed to fetch notifications:', err);
+        }
+    };
 
     useEffect(() => {
         const fetchTasks = async () => {
@@ -20,6 +30,13 @@ const TechnicianDashboard = () => {
             }
         };
         fetchTasks();
+        fetchNotifications();
+
+        const interval = setInterval(() => {
+            fetchNotifications();
+        }, 30000); // Poll every 30 seconds
+
+        return () => clearInterval(interval);
     }, []);
 
     const statusFlow = [
@@ -32,6 +49,15 @@ const TechnicianDashboard = () => {
         'Ready for Delivery',
         'Delivered / Issue Resolved'
     ];
+
+    const markAsRead = async (id) => {
+        try {
+            await axios.patch(`${API_BASE}/api/notifications/${id}`);
+            setNotifications(prev => prev.filter(n => n.id !== id));
+        } catch (err) {
+            console.error('Failed to mark notification as read:', err);
+        }
+    };
 
     const advanceStatus = async (id, currentStatus) => {
         const currentIndex = statusFlow.indexOf(currentStatus);
@@ -66,6 +92,39 @@ const TechnicianDashboard = () => {
                 </h2>
                 <p style={{ color: 'var(--text-muted)', marginTop: '8px', fontSize: '0.9rem' }}>Manage your active repair orders and update status.</p>
             </div>
+
+            {notifications.length > 0 && (
+                <div style={{ marginBottom: '30px' }}>
+                    <h3 style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', color: 'var(--accent)' }}>
+                        <Bell size={20} /> Active Bot Alerts
+                    </h3>
+                    <div style={{ display: 'grid', gap: '10px' }}>
+                        {notifications.map(notif => (
+                            <motion.div
+                                key={notif.id}
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="glass-card"
+                                style={{ padding: '15px 20px', borderLeft: '4px solid var(--accent)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 107, 107, 0.05)' }}
+                            >
+                                <div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                                        {notif.complaint_id ? `Ticket: ${notif.complaint_id}` : 'General Inquiry'} • {new Date(notif.created_at).toLocaleTimeString()}
+                                    </div>
+                                    <div style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>{notif.message}</div>
+                                </div>
+                                <button 
+                                    onClick={() => markAsRead(notif.id)}
+                                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '5px' }}
+                                    title="Mark as Read"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div style={{ display: 'grid', gap: '20px' }}>
                 {tasks.map(task => (
