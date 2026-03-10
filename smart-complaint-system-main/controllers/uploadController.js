@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const AZURE_STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING;
-const CONTAINER_NAME = 'appliance-photos';
+const CONTAINER_NAME = 'complaint-images';
 
 async function uploadToBlob(file) {
     if (!AZURE_STORAGE_CONNECTION_STRING) {
