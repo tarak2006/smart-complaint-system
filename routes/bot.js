@@ -45,19 +45,16 @@ class AstraBot extends ActivityHandler {
                     const data = await getComplaintById(complaintId);
                     
                     const responseText = `📍 **Complaint Status Found!**
-                    
+
 **Ticket ID**: ${data.complaintId}
 **Status**: ${data.status}
 **Appliance**: ${data.applianceType} (${data.applianceBrand})
 **Technician**: ${data.technician || 'Not Assigned Yet'}
 **Issue**: ${data.issueDescription}
 
-**Diagnostic Suggestions**:
-1. Check the power supply and fuses.
-2. Ensure the appliance has proper ventilation.
-3. Reset the device by unplugging for 5 minutes.
-
-**Not satisfied?** Type **"Contact Technician"** to speak with ${data.technician || 'our support lead'}.`;
+**What next?**
+• Type **"Suggestions"** for diagnostic tips
+• Type **"Contact Technician"** to reach support`;
                     
                     await context.sendActivity(MessageFactory.text(responseText));
                 } catch (err) {
@@ -66,7 +63,23 @@ class AstraBot extends ActivityHandler {
                 }
             }
 
-            // --- 2. Escalation / Contact Technician ---
+            // --- 2. Suggestions / Diagnostic Tips ---
+            else if (query.includes('suggestion') || query.includes('diagnostic') || query.includes('tips') || query.includes('help')) {
+                const suggestionsText = `🛠️ **Diagnostic Suggestions**
+
+**Basic Troubleshooting Steps:**
+1. ✓ Check the power supply and fuses
+2. ✓ Ensure the appliance has proper ventilation
+3. ✓ Reset the device by unplugging for 5 minutes
+4. ✓ Check for any error codes on display
+
+**Still having issues?**
+Type **"Contact Technician"** to connect with our support team!`;
+                
+                await context.sendActivity(MessageFactory.text(suggestionsText));
+            }
+
+            // --- 3. Escalation / Contact Technician ---
             else if (query.includes('contact') || query.includes('technician') || query.includes('talk')) {
                 // Extract ticket ID from context if possible
                 const lastTicket = query.match(/(ast-\d{4}-\w+|comp-\w+)/i)?.[0]?.toUpperCase() || null;
@@ -81,19 +94,19 @@ class AstraBot extends ActivityHandler {
                     console.error('❌ Failed to create bot notification:', err.message);
                 }
 
-                await context.sendActivity(MessageFactory.text("Connecting you to our technician portal... 📞\n\nPlease hold on while I notify the assigned specialist. Alternatively, you can call our priority line: **1800-ASTRA-CARE**."));
+                await context.sendActivity(MessageFactory.text("Connecting you to our technician portal... 📞\n\nPlease hold on while I notify the assigned specialist.\n\n**Alternatively, call us:**\n📱 1800-ASTRA-CARE"));
             }
 
-            // --- 3. Troubleshooting / Suggestions (Pre-emptive) ---
-            else if (['leaking', 'cooling', 'cool', 'noise', 'working'].some(kw => query.includes(kw))) {
-                 await context.sendActivity(MessageFactory.text("I've noticed you're having trouble with your appliance. 🛠️\n\n**Quick Check:**\n- Is it plugged in?\n- Are there any error codes on the display?\n\nIf you have a ticket, please share the **ID** (e.g., AST-2026-XXXX) for a detailed status!"));
+            // --- 4. Troubleshooting / Issue Description ---
+            else if (['leaking', 'cooling', 'cool', 'noise', 'working', 'broken', 'not working', 'damage', 'issue'].some(kw => query.includes(kw))) {
+                 await context.sendActivity(MessageFactory.text("I see you're having trouble with your appliance. 🛠️\n\n**Quick questions:**\n• Is it plugged in?\n• Any error codes on the display?\n\n**To help you better:**\n1️⃣ Share your complaint **Ticket ID** (e.g., AST-2026-XXXX) for detailed status\n2️⃣ Type **\"Suggestions\"** for troubleshooting tips\n3️⃣ Type **\"Contact Technician\"** to reach our support team"));
             }
 
-            // --- 4. General Interaction ---
+            // --- 5. General Interaction ---
             else if (query.includes('hi') || query.includes('hello')) {
-                await context.sendActivity(MessageFactory.text("Hello! I'm Astra, your AI service assistant. Give me a Complaint ID to track status, or describe your issue for suggestions!"));
+                await context.sendActivity(MessageFactory.text("👋 Hello! I'm **Astra**, your AI service assistant.\n\n**How can I help?**\n📍 Share a **Complaint ID** to check status\n💡 Type **\"Suggestions\"** for troubleshooting tips\n👨‍🔧 Type **\"Contact Technician\"** to reach support\n\nWhat would you like to do?"));
             } else {
-                await context.sendActivity(MessageFactory.text(`I'm Astra! I can help you track "${rawText}" if you provide a valid Complaint ID, or help you troubleshoot your appliances.`));
+                await context.sendActivity(MessageFactory.text(`I'm **Astra**! 🤖\n\n**I can help you with:**\n✓ Check status: Share your **Complaint ID** (e.g., AST-2026-XXXX)\n✓ Get tips: Type **\"Suggestions\"** for diagnostic help\n✓ Contact support: Type **\"Contact Technician\"**\n\nWhat would you like?`));
             }
 
             await next();
