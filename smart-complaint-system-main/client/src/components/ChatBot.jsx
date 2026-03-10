@@ -4,44 +4,6 @@ import { MessageCircle, Send, X, Bot, User } from 'lucide-react';
 import { API_BASE } from '../config';
 
 const ChatBot = () => {
-    const [chatOpen, setChatOpen] = useState(false);
-    const [chatComplaintId, setChatComplaintId] = useState('');
-    const [chatMessages, setChatMessages] = useState([]);
-    const [chatInput, setChatInput] = useState('');
-    const [chatLoading, setChatLoading] = useState(false);
-        // Fetch chat messages for a complaint
-        const fetchChatMessages = async (complaintId) => {
-            setChatLoading(true);
-            try {
-                const res = await fetch(`${API_BASE}/api/chat/${complaintId}`);
-                const data = await res.json();
-                setChatMessages(data);
-            } catch (err) {
-                setChatMessages([]);
-            } finally {
-                setChatLoading(false);
-            }
-        };
-
-        // Send chat message
-        const sendChatMessage = async () => {
-            if (!chatInput.trim() || !chatComplaintId) return;
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            try {
-                await fetch(`${API_BASE}/api/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        complaintId: chatComplaintId,
-                        senderRole: 'User',
-                        senderId: user.id,
-                        message: chatInput
-                    })
-                });
-                setChatInput('');
-                fetchChatMessages(chatComplaintId);
-            } catch (err) {}
-        };
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
         { id: 1, text: "Hello! I'm your UrbanCare AI assistant. How can I help you with your appliance service request today?", sender: 'bot' }
@@ -78,6 +40,12 @@ const ChatBot = () => {
                 serviceUrl: API_BASE
             };
 
+            // if user explicitly asks for technician, set flag so tracking page can open chat
+            const lc = currentInput.toLowerCase();
+            if (lc.includes('contact') && lc.includes('technician')) {
+                localStorage.setItem('openTechChat', 'true');
+            }
+
             const response = await fetch(`${API_BASE}/api/bot/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -90,6 +58,11 @@ const ChatBot = () => {
                 throw new Error(errorData.message || 'Bot Service offline');
             }
             const data = await response.json();
+
+            // if bot response asked for complaint id, also keep flag for chat window
+            if (data && JSON.stringify(data).toLowerCase().includes('complaint id')) {
+                localStorage.setItem('openTechChat', 'true');
+            }
 
             // Handle array of activities (Synchronous Reply Hack)
             const botActivities = Array.isArray(data) ? data : [data];
@@ -120,6 +93,7 @@ const ChatBot = () => {
     };
 
 
+
     return (
         <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 1000 }}>
             <AnimatePresence>
@@ -147,70 +121,48 @@ const ChatBot = () => {
                             <X size={18} cursor="pointer" onClick={() => setIsOpen(false)} />
                         </div>
 
-                        {/* Chat trigger for user */}
-                        <div style={{ padding: '10px 20px', borderBottom: '1px solid var(--glass-border)', display: 'flex', gap: '10px', alignItems: 'center' }}>
-                            <input
-                                type="text"
-                                value={chatComplaintId}
-                                onChange={e => setChatComplaintId(e.target.value)}
-                                placeholder="Enter Complaint ID to chat"
-                                style={{ flex: 1, borderRadius: '8px', padding: '8px', border: '1px solid var(--glass-border)' }}
-                            />
-                            <button
-                                className="glow-button"
-                                style={{ padding: '8px 16px', fontSize: '0.85rem', background: 'var(--accent)', color: 'white' }}
-                                onClick={() => {
-                                    setChatOpen(true);
-                                    fetchChatMessages(chatComplaintId);
-                                }}
-                            >
-                                <MessageCircle size={16} /> Start Chat
-                            </button>
-                        </div>
-                        <AnimatePresence>
-                            {chatOpen && (
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    style={{ position: 'absolute', top: '60px', left: 0, width: '100%', background: 'rgba(0,0,0,0.8)', zIndex: 1001, borderRadius: '8px', padding: '10px' }}
+                        {/* Messages */}
+                        <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            {messages.map((msg) => (
+                                <div
+                                    key={msg.id}
+                                    style={{
+                                        alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                                        maxWidth: '80%', display: 'flex', gap: '8px',
+                                        flexDirection: msg.sender === 'user' ? 'row-reverse' : 'row'
+                                    }}
                                 >
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                                        <span style={{ fontWeight: 600 }}>Chat for {chatComplaintId}</span>
-                                        <X size={18} cursor="pointer" onClick={() => setChatOpen(false)} />
+                                    {msg.sender === 'bot' && (
+                                        <div style={{
+                                            width: '28px', height: '28px', borderRadius: '50%',
+                                            background: 'rgba(255,255,255,0.05)', display: 'flex',
+                                            alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                                            border: '1px solid var(--glass-border)'
+                                        }}>
+                                            <Bot size={16} color="var(--text-main)" />
+                                        </div>
+                                    )}
+                                    <div style={{
+                                        padding: '10px 14px', borderRadius: '15px', fontSize: '0.9rem',
+                                        background: msg.sender === 'user' ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
+                                        border: msg.sender === 'user' ? 'none' : '1px solid var(--glass-border)',
+                                        color: msg.sender === 'user' ? 'var(--bg-dark)' : 'var(--text-main)'
+                                    }}>
+                                        {msg.text}
                                     </div>
-                                    <div style={{ minHeight: '120px', maxHeight: '200px', overflowY: 'auto', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', marginBottom: '10px' }}>
-                                        {chatLoading ? <div>Loading...</div> : (
-                                            chatMessages.length === 0 ? <div style={{ color: 'var(--text-muted)' }}>No messages yet.</div> : (
-                                                chatMessages.map(msg => (
-                                                    <div key={msg.id} style={{ marginBottom: '10px', textAlign: msg.sender_role === 'User' ? 'right' : 'left' }}>
-                                                        <span style={{ fontWeight: 500, color: msg.sender_role === 'User' ? 'var(--accent)' : 'var(--primary)' }}>{msg.sender_role}:</span>
-                                                        <span style={{ marginLeft: '8px', color: 'var(--text-main)' }}>{msg.message}</span>
-                                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{new Date(msg.created_at).toLocaleString()}</div>
-                                                    </div>
-                                                ))
-                                            )
-                                        )}
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '10px' }}>
-                                        <input
-                                            type="text"
-                                            value={chatInput}
-                                            onChange={e => setChatInput(e.target.value)}
-                                            placeholder="Type a message..."
-                                            style={{ flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', borderRadius: '20px', padding: '8px 15px', color: 'white', outline: 'none' }}
-                                            onKeyPress={e => e.key === 'Enter' && sendChatMessage()}
-                                        />
-                                        <button
-                                            onClick={sendChatMessage}
-                                            style={{ background: 'var(--accent)', border: 'none', borderRadius: '50%', width: '35px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer' }}
-                                        >
-                                            <Send size={16} color="var(--bg-dark)" />
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                    {msg.sender === 'user' && (
+                                        <div style={{
+                                            width: '28px', height: '28px', borderRadius: '50%',
+                                            background: 'var(--primary-glow)', display: 'flex',
+                                            alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                                        }}>
+                                            <User size={16} color="var(--primary)" />
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                            <div ref={messagesEndRef} />
+                        </div>
 
                         {/* Input */}
                         <div style={{ padding: '15px', borderTop: '1px solid var(--glass-border)', display: 'flex', gap: '10px' }}>

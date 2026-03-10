@@ -12,6 +12,13 @@ import { Zap, History, Search, PlusCircle, LogOut, User as UserIcon, ShieldCheck
 function App() {
   const [user, setUser] = useState(null);
   const [complaintData, setComplaintData] = useState(null);
+
+  // remember last viewed complaint ID so chatbot or other components can access it
+  useEffect(() => {
+    if (complaintData && complaintData.complaintId) {
+      localStorage.setItem('currentComplaintId', complaintData.complaintId);
+    }
+  }, [complaintData]);
   const [view, setView] = useState('register');
 
   useEffect(() => {

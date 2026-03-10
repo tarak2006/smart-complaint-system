@@ -1,47 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import ChatWindow from './ChatWindow';
 import { motion } from 'framer-motion';
 import { Briefcase, Clipboard, CheckCircle, Package, Truck, AlertCircle, Bell, X } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE } from '../config';
 
 const TechnicianDashboard = () => {
-    const [chatOpen, setChatOpen] = useState(false);
-    const [chatComplaintId, setChatComplaintId] = useState(null);
-    const [chatMessages, setChatMessages] = useState([]);
-    const [chatInput, setChatInput] = useState('');
-    const [chatLoading, setChatLoading] = useState(false);
-        // Fetch chat messages for a complaint
-        const fetchChatMessages = async (complaintId) => {
-            setChatLoading(true);
-            try {
-                const res = await axios.get(`${API_BASE}/api/chat/${complaintId}`);
-                setChatMessages(res.data);
-            } catch (err) {
-                setChatMessages([]);
-            } finally {
-                setChatLoading(false);
-            }
-        };
-
-        // Send chat message
-        const sendChatMessage = async () => {
-            if (!chatInput.trim() || !chatComplaintId) return;
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            try {
-                await axios.post(`${API_BASE}/api/chat`, {
-                    complaintId: chatComplaintId,
-                    senderRole: 'Technician',
-                    senderId: user.id,
-                    message: chatInput
-                });
-                setChatInput('');
-                fetchChatMessages(chatComplaintId);
-            } catch (err) {}
-        };
     const [tasks, setTasks] = useState([]);
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [chatComplaintId, setChatComplaintId] = useState(null);
+    const [chatOpen, setChatOpen] = useState(false);
 
     const fetchNotifications = async () => {
         try {
@@ -93,6 +62,12 @@ const TechnicianDashboard = () => {
         }
     };
 
+    const openChat = (complaintId) => {
+        if (!complaintId) return;
+        setChatComplaintId(complaintId);
+        setChatOpen(true);
+    };
+
     const advanceStatus = async (id, currentStatus) => {
         const currentIndex = statusFlow.indexOf(currentStatus);
         const nextStatus = statusFlow[currentIndex + 1] || currentStatus;
@@ -112,6 +87,7 @@ const TechnicianDashboard = () => {
             console.error('Failed to advance status:', err);
         }
     };
+
 
     return (
         <motion.div
@@ -156,17 +132,10 @@ const TechnicianDashboard = () => {
                                         <X size={18} />
                                     </button>
                                     {notif.complaint_id && (
-                                        <button
-                                            className="chat-btn"
-                                            style={{ padding: '6px 14px', fontSize: '0.85rem', background: '#1976d2', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer', transition: 'background 0.2s, color 0.2s' }}
-                                            onClick={() => {
-                                                setChatOpen(true);
-                                                setChatComplaintId(notif.complaint_id);
-                                                fetchChatMessages(notif.complaint_id);
-                                                markAsRead(notif.id);
-                                            }}
-                                            onMouseOver={e => { e.target.style.background = 'white'; e.target.style.color = '#1976d2'; }}
-                                            onMouseOut={e => { e.target.style.background = '#1976d2'; e.target.style.color = 'white'; }}
+                                        <button 
+                                            onClick={() => openChat(notif.complaint_id)}
+                                            className="glow-button"
+                                            style={{ padding: '6px 12px', fontSize: '0.75rem' }}
                                         >
                                             Chat
                                         </button>
@@ -214,11 +183,7 @@ const TechnicianDashboard = () => {
                             <button
                                 className="glow-button"
                                 style={{ padding: '8px 16px', fontSize: '0.85rem', marginTop: '5px', background: 'var(--accent)', color: 'white' }}
-                                onClick={() => {
-                                    setChatOpen(true);
-                                    setChatComplaintId(task.complaintId);
-                                    fetchChatMessages(task.complaintId);
-                                }}
+                                onClick={() => openChat(task.complaintId)}
                             >
                                 <MessageCircle size={16} /> Chat
                             </button>
@@ -231,51 +196,15 @@ const TechnicianDashboard = () => {
                     </div>
                 )}
             </div>
-        <AnimatePresence>
+
+            {/* Chat window for technician */}
             {chatOpen && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="glass-card fade-in-up"
-                    style={{ position: 'fixed', top: '10%', left: '50%', transform: 'translateX(-50%)', zIndex: 1000, width: '400px', maxHeight: '70vh', overflow: 'auto', boxShadow: '0 8px 32px var(--accent-glow)' }}
-                >
-                    <div style={{ padding: '15px 20px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: 600 }}>Chat for {chatComplaintId}</span>
-                        <X size={18} cursor="pointer" onClick={() => setChatOpen(false)} />
-                    </div>
-                    <div style={{ padding: '15px', minHeight: '200px', maxHeight: '300px', overflowY: 'auto', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
-                        {chatLoading ? <div>Loading...</div> : (
-                            chatMessages.length === 0 ? <div style={{ color: 'var(--text-muted)' }}>No messages yet.</div> : (
-                                chatMessages.map(msg => (
-                                    <div key={msg.id} style={{ marginBottom: '10px', textAlign: msg.sender_role === 'Technician' ? 'right' : 'left' }}>
-                                        <span style={{ fontWeight: 500, color: msg.sender_role === 'Technician' ? 'var(--accent)' : 'var(--primary)' }}>{msg.sender_role}:</span>
-                                        <span style={{ marginLeft: '8px', color: 'var(--text-main)' }}>{msg.message}</span>
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{new Date(msg.created_at).toLocaleString()}</div>
-                                    </div>
-                                ))
-                            )
-                        )}
-                    </div>
-                    <div style={{ padding: '15px', borderTop: '1px solid var(--glass-border)', display: 'flex', gap: '10px' }}>
-                        <input
-                            type="text"
-                            value={chatInput}
-                            onChange={e => setChatInput(e.target.value)}
-                            placeholder="Type a message..."
-                            style={{ flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', borderRadius: '20px', padding: '8px 15px', color: 'white', outline: 'none' }}
-                            onKeyPress={e => e.key === 'Enter' && sendChatMessage()}
-                        />
-                        <button
-                            onClick={sendChatMessage}
-                            style={{ background: 'var(--accent)', border: 'none', borderRadius: '50%', width: '35px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer' }}
-                        >
-                            <Send size={16} color="var(--bg-dark)" />
-                        </button>
-                    </div>
-                </motion.div>
+                <ChatWindow
+                    complaintId={chatComplaintId || 'GENERAL'}
+                    role="Technician"
+                    onClose={() => setChatOpen(false)}
+                />
             )}
-        </AnimatePresence>
         </motion.div>
     );
 };

@@ -75,10 +75,20 @@ class AstraBot extends ActivityHandler {
                     return;
                 }
                 try {
+                    // record initial notification and also seed chat messages table
+                    const targetId = lastTicket || 'GENERAL';
                     await connectAndQuery(
                         'INSERT INTO BotNotifications (complaint_id, message) VALUES (?, ?)',
-                        [lastTicket, `User is requesting technical assistance. Input: "${rawText}"`]
+                        [targetId, `User is requesting technical assistance. Input: "${rawText}"`]
                     );
+                    try {
+                        await connectAndQuery(
+                            'INSERT INTO ChatMessages (complaint_id, sender_role, sender_id, message) VALUES (?, ?, ?, ?)',
+                            [targetId, 'User', 0, rawText]
+                        );
+                    } catch (chatErr) {
+                        console.error('❌ Could not seed chat message:', chatErr.message);
+                    }
                     console.log('✅ Notification sent to technician');
                 } catch (err) {
                     console.error('❌ Failed to create bot notification:', err.message);

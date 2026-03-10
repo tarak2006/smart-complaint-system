@@ -40,6 +40,12 @@ const ChatBot = () => {
                 serviceUrl: API_BASE
             };
 
+            // if user explicitly asks for technician, set flag so tracking page can open chat
+            const lc = currentInput.toLowerCase();
+            if (lc.includes('contact') && lc.includes('technician')) {
+                localStorage.setItem('openTechChat', 'true');
+            }
+
             const response = await fetch(`${API_BASE}/api/bot/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -52,6 +58,11 @@ const ChatBot = () => {
                 throw new Error(errorData.message || 'Bot Service offline');
             }
             const data = await response.json();
+
+            // if bot response asked for complaint id, also keep flag for chat window
+            if (data && JSON.stringify(data).toLowerCase().includes('complaint id')) {
+                localStorage.setItem('openTechChat', 'true');
+            }
 
             // Handle array of activities (Synchronous Reply Hack)
             const botActivities = Array.isArray(data) ? data : [data];
