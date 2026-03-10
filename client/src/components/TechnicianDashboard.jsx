@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import ChatWindow from './ChatWindow';
 import { motion } from 'framer-motion';
 import { Briefcase, Clipboard, CheckCircle, Package, Truck, AlertCircle, Bell, X } from 'lucide-react';
 import axios from 'axios';
@@ -9,8 +8,6 @@ const TechnicianDashboard = () => {
     const [tasks, setTasks] = useState([]);
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [chatComplaintId, setChatComplaintId] = useState(null);
-    const [chatOpen, setChatOpen] = useState(false);
 
     const fetchNotifications = async () => {
         try {
@@ -60,12 +57,6 @@ const TechnicianDashboard = () => {
         } catch (err) {
             console.error('Failed to mark notification as read:', err);
         }
-    };
-
-    const openChat = (complaintId) => {
-        if (!complaintId) return;
-        setChatComplaintId(complaintId);
-        setChatOpen(true);
     };
 
     const advanceStatus = async (id, currentStatus) => {
@@ -123,13 +114,6 @@ const TechnicianDashboard = () => {
                                     <div style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>{notif.message}</div>
                                 </div>
                                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                        <button 
-                            onClick={() => openChat(notif.complaint_id || 'GENERAL')}
-                            className="glow-button"
-                            style={{ padding: '6px 12px', fontSize: '0.75rem' }}
-                        >
-                            Chat
-                        </button>
                         <button 
                             onClick={() => markAsRead(notif.id)}
                                     style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '5px' }}
@@ -195,15 +179,6 @@ const TechnicianDashboard = () => {
                     </div>
                 )}
             </div>
-
-            {/* Chat window for technician */}
-            {chatOpen && (
-                <ChatWindow
-                    complaintId={chatComplaintId || 'GENERAL'}
-                    role="Technician"
-                    onClose={() => setChatOpen(false)}
-                />
-            )}
         </motion.div>
     );
 };

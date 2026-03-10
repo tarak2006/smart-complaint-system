@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, CheckCircle2, TrendingUp, CalendarDays } from 'lucide-react';
-import ChatWindow from './ChatWindow';
 
 const TrackingDashboard = ({ data, onBack }) => {
     const stages = [
@@ -19,16 +18,6 @@ const TrackingDashboard = ({ data, onBack }) => {
     const currentStep = stages.indexOf(currentStatus);
     const workCompleted = Math.round(((currentStep + 1) / stages.length) * 100);
     const daysRemaining = data.estimatedDays || 3;
-
-    const [showChat, setShowChat] = useState(false);
-
-    useEffect(() => {
-        // open chat automatically if flagged by chatbot
-        if (localStorage.getItem('openTechChat') === 'true') {
-            setShowChat(true);
-            localStorage.removeItem('openTechChat');
-        }
-    }, []);
 
     return (
         <motion.div
@@ -127,15 +116,6 @@ const TrackingDashboard = ({ data, onBack }) => {
             <button className="glow-button" style={{ width: '100%', marginTop: '25px' }} onClick={onBack}>
                 Back to Portal
             </button>
-
-            {/* user-technician chat panel */}
-            {showChat && (
-                <ChatWindow
-                    complaintId={data.complaintId || 'GENERAL'}
-                    role="User"
-                    onClose={() => setShowChat(false)}
-                />
-            )}
         </motion.div>
     );
 };
