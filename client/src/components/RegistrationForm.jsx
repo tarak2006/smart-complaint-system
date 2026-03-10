@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ClipboardList, User, Home, AlertCircle, Calendar } from 'lucide-react';
+import { ClipboardList, User, Mail, Phone, Home, AlertCircle, Calendar, Image, Package } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE } from '../config';
 
@@ -29,7 +29,6 @@ const RegistrationForm = ({ user, onSuccess }) => {
         try {
             let uploadedUrl = null;
 
-            // Step 1: Upload image if exists
             if (formData.image) {
                 const uploadFormData = new FormData();
                 uploadFormData.append('file', formData.image);
@@ -40,7 +39,6 @@ const RegistrationForm = ({ user, onSuccess }) => {
                 uploadedUrl = uploadRes.data.url;
             }
 
-            // Step 2: Register complaint with image URL
             const complaintData = {
                 userId: user?.id || 1,
                 userName: formData.userName,
@@ -88,151 +86,291 @@ const RegistrationForm = ({ user, onSuccess }) => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="glass-card"
-            style={{ padding: '30px', maxWidth: '600px', margin: '0 auto' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}
         >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '30px', borderBottom: '1px solid var(--glass-border)', paddingBottom: '20px' }}>
-                <ClipboardList color="var(--primary)" />
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 500, letterSpacing: '0.5px' }}>Register Complaint</h2>
+            {/* Header */}
+            <div style={{ marginBottom: '50px', textAlign: 'center' }}>
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}
+                >
+                    <div style={{ 
+                        padding: '16px', 
+                        background: 'var(--gradient-primary)',
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <ClipboardList size={32} color="white" />
+                    </div>
+                </motion.div>
+                <h1 style={{ marginBottom: '10px', background: 'var(--gradient-primary)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    Register Your Complaint
+                </h1>
+                <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem' }}>
+                    Fill in your appliance details and get instant support
+                </p>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                <div style={{ gridColumn: 'span 2' }}>
-                    <label className="form-label">Full Name</label>
-                    <div className="input-with-icon">
-                        <User size={16} className="input-icon" />
-                        <input
-                            required
-                            className="form-input"
-                            type="text"
-                            placeholder="John Doe"
-                            value={formData.userName}
-                            onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
-                        />
-                    </div>
-                </div>
+            {/* Main Form Card */}
+            <motion.div
+                className="glass-card"
+                style={{ padding: '50px 40px' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+            >
+                <form onSubmit={handleSubmit}>
+                    {/* Personal Information Section */}
+                    <div style={{ marginBottom: '50px' }}>
+                        <h3 style={{ fontSize: '1.2rem', marginBottom: '30px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <User size={20} color="var(--primary)" />
+                            Personal Information
+                        </h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px' }}>
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}>
+                                <label className="form-label">Full Name</label>
+                                <div className="input-with-icon">
+                                    <User size={18} className="input-icon" />
+                                    <input
+                                        required
+                                        className="form-input"
+                                        type="text"
+                                        placeholder="John Doe"
+                                        value={formData.userName}
+                                        onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
+                                    />
+                                </div>
+                            </motion.div>
 
-                <div>
-                    <label className="form-label">Phone Number</label>
-                    <input
-                        required
-                        className="form-input"
-                        type="tel"
-                        placeholder="+91 9876543210"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    />
-                </div>
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+                                <label className="form-label">Phone Number</label>
+                                <div className="input-with-icon">
+                                    <Phone size={18} className="input-icon" />
+                                    <input
+                                        required
+                                        className="form-input"
+                                        type="tel"
+                                        placeholder="+91 9876543210"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    />
+                                </div>
+                            </motion.div>
 
-                <div>
-                    <label className="form-label">Email Address</label>
-                    <input
-                        required
-                        className="form-input"
-                        type="email"
-                        placeholder="john@example.com"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    />
-                </div>
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>
+                                <label className="form-label">Email Address</label>
+                                <div className="input-with-icon">
+                                    <Mail size={18} className="input-icon" />
+                                    <input
+                                        required
+                                        className="form-input"
+                                        type="email"
+                                        placeholder="john@example.com"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    />
+                                </div>
+                            </motion.div>
 
-                <div style={{ gridColumn: 'span 2' }}>
-                    <label className="form-label">Address</label>
-                    <input
-                        required
-                        className="form-input"
-                        type="text"
-                        placeholder="123 Main St, City, State"
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    />
-                </div>
-
-                <div>
-                    <label className="form-label">Appliance Type</label>
-                    <select
-                        className="form-input"
-                        value={formData.applianceType}
-                        onChange={(e) => setFormData({ ...formData, applianceType: e.target.value })}
-                    >
-                        <option>Washing Machine</option>
-                        <option>Refrigerator</option>
-                        <option>Air Conditioner</option>
-                        <option>Microwave Oven</option>
-                        <option>Television</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label className="form-label">Appliance Brand</label>
-                    <input
-                        required
-                        className="form-input"
-                        type="text"
-                        placeholder="Samsung, LG, etc."
-                        value={formData.applianceBrand}
-                        onChange={(e) => setFormData({ ...formData, applianceBrand: e.target.value })}
-                    />
-                </div>
-
-                <div style={{ gridColumn: 'span 2' }}>
-                    <label className="form-label">Issue Description</label>
-                    <textarea
-                        required
-                        className="form-input"
-                        rows="3"
-                        placeholder="Describe the problem..."
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        style={{ resize: 'none' }}
-                    />
-                </div>
-
-                <div>
-                    <label className="form-label">Preferred Pickup Date</label>
-                    <input
-                        required
-                        className="form-input"
-                        type="date"
-                        value={formData.pickupDate}
-                        onChange={(e) => setFormData({ ...formData, pickupDate: e.target.value })}
-                    />
-                </div>
-
-                <div style={{ gridColumn: 'span 2' }}>
-                    <label className="form-label">Evidence Photo (Optional)</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        className="form-input"
-                        onChange={handleImageChange}
-                        style={{ padding: '8px' }}
-                    />
-                    {formData.imagePreview && (
-                        <div style={{ marginTop: '10px', position: 'relative', width: '100px', height: '100px' }}>
-                            <img 
-                                src={formData.imagePreview} 
-                                alt="Preview" 
-                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--glass-border)' }} 
-                            />
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
+                                <label className="form-label">Street Address</label>
+                                <div className="input-with-icon">
+                                    <Home size={18} className="input-icon" />
+                                    <input
+                                        required
+                                        className="form-input"
+                                        type="text"
+                                        placeholder="123 Main St, City, State"
+                                        value={formData.address}
+                                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                    />
+                                </div>
+                            </motion.div>
                         </div>
-                    )}
-                </div>
+                    </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', gridColumn: 'span 2' }}>
-                    {error && <p style={{ color: '#ff4d4d', fontSize: '0.9rem', textAlign: 'center' }}>{error}</p>}
-                    <button
+                    {/* Appliance Information Section */}
+                    <div style={{ marginBottom: '50px', paddingTop: '30px', borderTop: '1px solid var(--glass-border)' }}>
+                        <h3 style={{ fontSize: '1.2rem', marginBottom: '30px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <Package size={20} color="var(--secondary)" />
+                            Appliance Details
+                        </h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px' }}>
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
+                                <label className="form-label">Appliance Type</label>
+                                <select
+                                    className="form-input"
+                                    value={formData.applianceType}
+                                    onChange={(e) => setFormData({ ...formData, applianceType: e.target.value })}
+                                    style={{ paddingRight: '40px' }}
+                                >
+                                    <option>Washing Machine</option>
+                                    <option>Refrigerator</option>
+                                    <option>Air Conditioner</option>
+                                    <option>Microwave Oven</option>
+                                    <option>Television</option>
+                                    <option>Dishwasher</option>
+                                    <option>Oven</option>
+                                </select>
+                            </motion.div>
+
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+                                <label className="form-label">Brand Name</label>
+                                <input
+                                    required
+                                    className="form-input"
+                                    type="text"
+                                    placeholder="Samsung, LG, etc."
+                                    value={formData.applianceBrand}
+                                    onChange={(e) => setFormData({ ...formData, applianceBrand: e.target.value })}
+                                />
+                            </motion.div>
+
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }} style={{ gridColumn: 'span 2' }}>
+                                <label className="form-label">Issue Description</label>
+                                <div className="input-with-icon">
+                                    <AlertCircle size={18} className="input-icon" style={{ top: '18px' }} />
+                                    <textarea
+                                        required
+                                        className="form-input"
+                                        placeholder="Describe the problem in detail..."
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        style={{ paddingLeft: '42px', minHeight: '120px', resize: 'vertical' }}
+                                    />
+                                </div>
+                            </motion.div>
+                        </div>
+                    </div>
+
+                    {/* Service Details Section */}
+                    <div style={{ marginBottom: '50px', paddingTop: '30px', borderTop: '1px solid var(--glass-border)' }}>
+                        <h3 style={{ fontSize: '1.2rem', marginBottom: '30px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <Calendar size={20} color="var(--success)" />
+                            Service Schedule
+                        </h3>
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
+                            <label className="form-label">Preferred Pickup Date</label>
+                            <div style={{ position: 'relative' }}>
+                                <Calendar size={18} style={{
+                                    position: 'absolute',
+                                    left: '16px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    color: 'var(--primary)',
+                                    pointerEvents: 'none',
+                                    zIndex: 1
+                                }} />
+                                <input
+                                    required
+                                    className="form-input"
+                                    type="date"
+                                    value={formData.pickupDate}
+                                    onChange={(e) => setFormData({ ...formData, pickupDate: e.target.value })}
+                                    style={{
+                                        paddingLeft: '50px',
+                                        fontSize: '1.1rem',
+                                        fontWeight: 500
+                                    }}
+                                />
+                            </div>
+                            <p style={{ color: 'var(--text-muted)', marginTop: '10px', fontSize: '0.9rem' }}>
+                                Choose a date when our technician can pick up your appliance
+                            </p>
+                        </motion.div>
+                    </div>
+
+                    {/* Photo Upload Section */}
+                    <div style={{ marginBottom: '40px', paddingTop: '30px', borderTop: '1px solid var(--glass-border)' }}>
+                        <h3 style={{ fontSize: '1.2rem', marginBottom: '30px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <Image size={20} color="var(--warning)" />
+                            Evidence Photo
+                        </h3>
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}>
+                            <label className="form-label">Upload Photo (Optional)</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="form-input"
+                                onChange={handleImageChange}
+                                style={{ padding: '16px', cursor: 'pointer' }}
+                            />
+                            {formData.imagePreview && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    style={{ marginTop: '20px' }}
+                                >
+                                    <p style={{ color: 'var(--text-muted)', marginBottom: '12px', fontSize: '0.9rem' }}>Preview:</p>
+                                    <img 
+                                        src={formData.imagePreview} 
+                                        alt="Preview" 
+                                        style={{
+                                            maxWidth: '200px',
+                                            height: '200px',
+                                            objectFit: 'cover',
+                                            borderRadius: '12px',
+                                            border: '2px solid var(--primary)',
+                                            boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)'
+                                        }}
+                                    />
+                                </motion.div>
+                            )}
+                        </motion.div>
+                    </div>
+
+                    {/* Error Message */}
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            style={{
+                                padding: '16px',
+                                background: 'rgba(239, 68, 68, 0.15)',
+                                border: '1px solid rgba(239, 68, 68, 0.5)',
+                                borderRadius: '10px',
+                                marginBottom: '30px',
+                                color: '#fca5a5',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px'
+                            }}
+                        >
+                            <AlertCircle size={20} />
+                            <span>{error}</span>
+                        </motion.div>
+                    )}
+
+                    {/* Submit Button */}
+                    <motion.button
                         className="glow-button"
                         type="submit"
                         disabled={loading}
-                        style={{ width: '100%' }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.7 }}
+                        style={{
+                            width: '100%',
+                            padding: '16px 32px',
+                            fontSize: '1.1rem',
+                            fontWeight: 600,
+                            minHeight: '54px',
+                            marginTop: '20px'
+                        }}
                     >
-                        {loading ? 'Processing...' : 'Generate Complaint ID'}
-                    </button>
-                </div>
-            </form>
+                        {loading ? '🔄 Processing...' : '✨ Generate Complaint ID'}
+                    </motion.button>
+                </form>
+            </motion.div>
         </motion.div>
     );
 };
