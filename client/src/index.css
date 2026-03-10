@@ -230,36 +230,6 @@ select.form-input {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(99, 102, 241, 0.6);
 }
-  border-color: var(--glass-border-hover);
-}
-
-.glow-button {
-  background: var(--primary);
-  border: 1px solid var(--primary);
-  border-radius: 8px;
-  color: var(--bg-dark);
-  padding: 12px 24px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  font-family: 'Outfit', sans-serif;
-  letter-spacing: 0.03em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.glow-button:hover {
-  background: transparent;
-  color: var(--primary);
-  transform: translateY(-1px);
-}
-
-.glow-button:active {
-  transform: translateY(1px);
-}
 
 .app-container {
   max-width: 1280px;
