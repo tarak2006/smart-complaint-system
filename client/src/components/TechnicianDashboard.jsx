@@ -137,6 +137,7 @@ const TechnicianDashboard = () => {
                                 >
                                     <X size={18} />
                                 </button>
+                            </div>
                             </motion.div>
                         ))}
                     </div>
